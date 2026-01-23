@@ -1,6 +1,8 @@
 import numpy as np
+from numba import jit, prange
 import tifffile as tiff
 from typing import Generator
+import time
 
 ##--------FILE IO--------##
 
@@ -25,6 +27,7 @@ def load_stack_slices(n_path: str, dn_path: str) -> Generator[
 
 ##--------CALCULATIONS--------##
 
+@jit(nopython=True, nogil=True, cache=False)
 def calc_snr(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
 
     num = np.sum(np.square(n_image))
@@ -34,6 +37,7 @@ def calc_snr(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
 
     return snr
 
+@jit(nopython=True, nogil=True, cache=False)
 def calc_cov(n_image: "np.ndarray", dn_image: "np.ndarray",
              noisy_mean: float, dn_mean: float) -> float:
     
@@ -41,6 +45,7 @@ def calc_cov(n_image: "np.ndarray", dn_image: "np.ndarray",
 
     return cov
 
+@jit(nopython=True, nogil=True, cache=False)
 def calc_ssim(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
 
     c1 = (0.01 * 65535) ** 2
@@ -55,9 +60,18 @@ def calc_ssim(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
 
     return ssim_num / ssim_denom
 
+@jit(nopython=True, nogil=True, cache=False, parallel=True)
 def calc_metrics(n_stack: "np.ndarray", dn_stack: "np.ndarray") -> "np.ndarray":
 
     psnr_and_ssim = np.zeros((n_stack.shape[0], 2), dtype=np.float32)
+
+    for i in prange(n_stack.shape[0]):
+
+        noisy_im = n_stack[i, :, :]
+        denoised_im = dn_stack[i, :, :]
+    
+        psnr_and_ssim[i, 0] = calc_snr(noisy_im, denoised_im)
+        psnr_and_ssim[i, 1] = calc_ssim(noisy_im, denoised_im)
 
     return psnr_and_ssim
 
@@ -67,3 +81,16 @@ def main():
 
     noisy_im_path = ""
     denoised_im_path = ""
+
+    n_stack = load_image_stack(noisy_im_path)
+    dn_stack = load_image_stack(denoised_im_path)
+
+    start = time.time()
+    metrics = calc_metrics(n_stack, dn_stack)
+    end = time.time()
+
+    print(str(end - start))
+    print(metrics[0:6, :])
+
+if __name__ == "__main__":
+    main()
