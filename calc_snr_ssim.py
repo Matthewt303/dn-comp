@@ -108,5 +108,7 @@ def main():
 
     save_results(metrics, out_folder, title)
 
+    print(str(end - start))
+
 if __name__ == "__main__":
     main()
