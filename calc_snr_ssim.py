@@ -1,8 +1,10 @@
 import numpy as np
 from numba import jit, prange
+import pandas as pd
 import tifffile as tiff
 from typing import Generator
 import time
+import os
 
 ##--------FILE IO--------##
 
@@ -73,14 +75,29 @@ def calc_metrics(n_stack: "np.ndarray", dn_stack: "np.ndarray") -> "np.ndarray":
         psnr_and_ssim[i, 0] = calc_snr(noisy_im, denoised_im)
         psnr_and_ssim[i, 1] = calc_ssim(noisy_im, denoised_im)
 
+        if i % 1000 == 0:
+            print("Completed " + str(i) + " of " +
+                  str(n_stack.shape[0]) + " frames")
+
     return psnr_and_ssim
 
-##--------PROGRAM START--------##
+def save_results(metrics: "np.ndarray", out: str, 
+                 title: str) -> None:
+
+    metrics_df = pd.DataFrame(metrics, columns=["SNR (dB)", "SSIM"])
+
+    metrics_df.to_csv(os.path.join(out, title), index=False)
 
 def main():
 
+    ##--------HYPERPARAMS--------##
+
     noisy_im_path = ""
     denoised_im_path = ""
+    out_folder = ""
+    title = ""
+
+    ##--------PROGRAM START--------##
 
     n_stack = load_image_stack(noisy_im_path)
     dn_stack = load_image_stack(denoised_im_path)
@@ -89,8 +106,7 @@ def main():
     metrics = calc_metrics(n_stack, dn_stack)
     end = time.time()
 
-    print(str(end - start))
-    print(metrics[0:6, :])
+    save_results(metrics, out_folder, title)
 
 if __name__ == "__main__":
     main()
