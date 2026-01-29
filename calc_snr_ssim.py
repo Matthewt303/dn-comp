@@ -43,9 +43,16 @@ def calc_snr(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
 def calc_cov(n_image: "np.ndarray", dn_image: "np.ndarray",
              noisy_mean: float, dn_mean: float) -> float:
     
-    cov = np.sum(((n_image - noisy_mean) * (dn_image - dn_mean)) / (n_image.shape[0] - 1))
+    cov = np.sum(((n_image - noisy_mean) * (dn_image - dn_mean)) / ((n_image.shape[0])**2 - 1))
 
     return cov
+
+@jit(nopython=True, nogil=True, cache=False)
+def calc_variance(image: "np.ndarray", image_mean: float) -> float:
+
+    variance = np.sum((image - image_mean) ** 2 / ((image.shape[0])**2 - 1))
+
+    return variance
 
 @jit(nopython=True, nogil=True, cache=False)
 def calc_ssim(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
@@ -54,11 +61,11 @@ def calc_ssim(n_image: "np.ndarray", dn_image: "np.ndarray") -> float:
     c2 = (0.03 * 65535) ** 2
 
     n_mean, dn_mean = np.mean(n_image), np.mean(dn_image)
-    n_var, dn_var = np.var(n_image), np.var(dn_image)
+    n_var, dn_var = calc_variance(n_image, n_mean), calc_variance(dn_image, dn_mean)
     covar = calc_cov(n_image, dn_image, n_mean, dn_mean)
 
     ssim_num = (2 * n_mean * dn_mean + c1) * (2 * covar + c2)
-    ssim_denom = (n_mean ** 2 + dn_mean ** 2 + c1) * (n_var ** 2 + dn_var ** 2 + c2)
+    ssim_denom = (n_mean ** 2 + dn_mean ** 2 + c1) * (n_var + dn_var + c2)
 
     return ssim_num / ssim_denom
 
