@@ -29,11 +29,22 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams['font.family'] = 'sans-serif'
-    mpl.rcParams['font.size'] = 24
+    mpl.rcParams['font.size'] = 28
 
-    fig, ax = plt.subplots(figsize=(16, 9), dpi=500)
+    cmap = mpl.colormaps["viridis"]
 
-    colors = ["aquamarine", "darkblue", "violet", "crimson", "darkred"]
+    fig, ax = plt.subplots(figsize=(19.2, 10.8), dpi=500)
+
+    # Axis labels
+
+    if param == "SNR":
+        y_unit = " (dB)"
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+    else:
+        y_unit = ""
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
+
+    colors = cmap(np.linspace(0, 1, len(conditions)))
 
     frame_axis = 1 + np.arange(20000)
 
@@ -41,16 +52,18 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
 
         data_20k = data[i][:20000]
 
-        ax.plot(frame_axis, data_20k, ls='-',
-                 color=colors[i],  label=conditions[i])
+        ax.plot(frame_axis, data_20k, ls='-', linewidth=3.5,
+                 alpha=0.75, color=colors[i],  label=conditions[i])
     
-    leg = plt.legend(loc='upper left', bbox_to_anchor=(1, 1), ncol=1)
+    leg = plt.legend(bbox_to_anchor=(0.5, 1.175), loc='upper center', ncol=3)
 
     for line in leg.get_lines():
         line.set_linewidth(3.5)
 
     for text in leg.get_texts():
         text.set_fontsize(28)
+    
+    ax.set_xlim(left=0, right=np.max(frame_axis) + 50)
 
     ax.tick_params(axis='y', which='major', length=10, direction='in')
     ax.tick_params(axis='y', which='minor', length=5, direction='in')
@@ -59,8 +72,6 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
 
     ax.xaxis.set_minor_locator(AutoMinorLocator(10))
     ax.yaxis.set_minor_locator(AutoMinorLocator(10))
-    ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
-    ax.xaxis.set_major_formatter(FormatStrFormatter("%.1f"))
 
     ax.xaxis.label.set_color('black')
     ax.yaxis.label.set_color('black')
@@ -73,13 +84,6 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     ax.spines['top'].set_linewidth(1.0)
     ax.spines['right'].set_linewidth(1.0)
     ax.spines['left'].set_linewidth(1.0)
-
-    # Axis labels
-
-    if param == "SNR":
-        y_unit = " (dB)"
-    else:
-        y_unit = ""
 
     ax.set_xlabel('Frame', labelpad=6, fontsize=32)
     ax.set_ylabel(param + y_unit, labelpad=2, fontsize=32)
