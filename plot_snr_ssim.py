@@ -25,7 +25,7 @@ def load_snr_ssim_file(file: str) -> "np.ndarray":
     return np.array(snr_ssim_data).astype(np.float32)
 
 def plot_data(data: list["np.ndarray"], conditions: list[str],
-             output_folder: str, param: str) -> None:
+             output_folder: str, frame_range: int, param: str) -> None:
     
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams['font.family'] = 'sans-serif'
@@ -45,14 +45,15 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
         ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
 
     colors = cmap(np.linspace(0, 1, len(conditions)))
+    #colors = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7"]
 
-    frame_axis = 1 + np.arange(20000)
+    frame_axis = 1 + np.arange(frame_range)
 
     for i in range(len(data)):
 
-        data_20k = data[i][:20000]
+        data_20k = data[i][:frame_range]
 
-        ax.plot(frame_axis, data_20k, ls='-', linewidth=3.5,
+        ax.plot(frame_axis, data_20k, ls='-', linewidth=4.5,
                  alpha=0.75, color=colors[i],  label=conditions[i])
     
     leg = plt.legend(bbox_to_anchor=(0.5, 1.175), loc='upper center', ncol=3)
@@ -63,7 +64,7 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     for text in leg.get_texts():
         text.set_fontsize(28)
     
-    ax.set_xlim(left=0, right=np.max(frame_axis) + 50)
+    ax.set_xlim(left=0, right=np.max(frame_axis) + 100)
 
     ax.tick_params(axis='y', which='major', length=10, direction='in')
     ax.tick_params(axis='y', which='minor', length=5, direction='in')
@@ -91,12 +92,24 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     plt.savefig(os.path.join(output_folder, param + "_plot.svg"))
     plt.savefig(os.path.join(output_folder, param + "_plot.png"))
 
+def save_stats(mean_stats: "np.ndarray", conditions: list[str],
+               output_folder: str) -> None:
+    
+    dataframe = pd.DataFrame(mean_stats, columns=["SNR (dN)", "SSIM"])
+
+    dataframe.insert(0, "Conditions", conditions)
+
+    dataframe.to_csv(os.path.join(output_folder, "mean_stats.csv"), index=False)
+
 def main():
 
     ##--------PATHS-------##
 
     input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/snr_ssim_meas"
     output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/snr_ssim_results"
+    
+    ##--------INITIALIZE-------##
+    
     conditions = [
         "MT, self-train",
         "NPC, MT-train",
@@ -105,24 +118,30 @@ def main():
         "ACE-2, self-train"
     ]
 
-    ##--------INITIALIZE-------##
+    frame_range = 20000
 
     all_snr_data = []
     all_ssim_data = []
+
+    mean_stats = np.zeros((len(conditions), 2))
 
     ##--------PROGRAM START-------##
 
     all_files = collate_files(input_folder)
 
-    for file in all_files:
+    for i, file in enumerate(all_files):
 
         data = load_snr_ssim_file(file)
+
+        mean_stats[i, :] = np.mean(data, axis=0)
 
         all_snr_data.append(data[:, 0])
         all_ssim_data.append(data[:, 1])
     
-    plot_data(all_snr_data, conditions, output_folder, param="SNR")
-    plot_data(all_ssim_data, conditions, output_folder, param="SSIM")
+    plot_data(all_snr_data, conditions, output_folder, frame_range, param="SNR")
+    plot_data(all_ssim_data, conditions, output_folder, frame_range, param="SSIM")
+
+    save_stats(mean_stats, conditions, output_folder)
 
 if __name__ == "__main__":
     main()
