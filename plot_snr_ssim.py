@@ -53,8 +53,8 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
 
         data_20k = data[i][:frame_range]
 
-        ax.plot(frame_axis, data_20k, ls='-', linewidth=4.5,
-                 alpha=0.75, color=colors[i],  label=conditions[i])
+        ax.plot(frame_axis, data_20k, 'o', ls='-', linewidth=4.5,
+                 alpha=0.05, color=colors[i],  label=conditions[i])
     
     leg = plt.legend(bbox_to_anchor=(0.5, 1.175), loc='upper center', ncol=3)
 
@@ -105,17 +105,17 @@ def main():
 
     ##--------PATHS-------##
 
-    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/snr_ssim_meas"
-    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/snr_ssim_results"
+    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d1_snr_ssim_meas/self"
+    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d1_snr_ssim_meas/self_results"
     
     ##--------INITIALIZE-------##
     
     conditions = [
-        "MT, self-train",
-        "NPC, MT-train",
-        "NPC, self-train",
-        "ACE-2, MT-train",
-        "ACE-2, self-train"
+        "MT, self-trained",
+        #"NPC, MT-trained",
+        "NPC, self-trained",
+        #"ACE-2, MT-trained"
+        "ACE-2, self-trained"
     ]
 
     frame_range = 20000
