@@ -44,8 +44,8 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
         y_unit = ""
         ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
 
-    colors = cmap(np.linspace(0, 1, len(conditions)))
-    #colors = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7"]
+    #colors = cmap(np.linspace(0, 1, len(conditions)))
+    colors = ["darkblue", "darkred", "darkviolet"]
 
     frame_axis = 1 + np.arange(frame_range)
 
@@ -53,13 +53,14 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
 
         data_20k = data[i][:frame_range]
 
-        ax.plot(frame_axis, data_20k, 'o', ls='-', linewidth=4.5,
-                 alpha=0.05, color=colors[i],  label=conditions[i])
+        ax.plot(frame_axis, data_20k, ls='-', linewidth=4.5,
+                 alpha=0.7, color=colors[i],  label=conditions[i])
     
-    leg = plt.legend(bbox_to_anchor=(0.5, 1.175), loc='upper center', ncol=3)
+    leg = plt.legend(bbox_to_anchor=(0.5, 1.125), loc='upper center', ncol=3)
 
     for line in leg.get_lines():
         line.set_linewidth(3.5)
+        line.set_alpha(1.0)
 
     for text in leg.get_texts():
         text.set_fontsize(28)
@@ -93,11 +94,14 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     plt.savefig(os.path.join(output_folder, param + "_plot.png"))
 
 def save_stats(mean_stats: "np.ndarray", conditions: list[str],
-               output_folder: str) -> None:
+               dataset_num: int, output_folder: str) -> None:
+    
+    dataset_num_list = [str(dataset_num)] * mean_stats.shape[0]
     
     dataframe = pd.DataFrame(mean_stats, columns=["SNR (dN)", "SSIM"])
 
     dataframe.insert(0, "Conditions", conditions)
+    dataframe.insert(0, "Dataset", dataset_num_list)
 
     dataframe.to_csv(os.path.join(output_folder, "mean_stats.csv"), index=False)
 
@@ -105,18 +109,20 @@ def main():
 
     ##--------PATHS-------##
 
-    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d1_snr_ssim_meas/self"
-    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d1_snr_ssim_meas/self_results"
+    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d3_snr_ssim_meas/tub"
+    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d3_snr_ssim_meas/tub_results"
     
     ##--------INITIALIZE-------##
     
     conditions = [
-        "MT, self-trained",
-        #"NPC, MT-trained",
-        "NPC, self-trained",
-        #"ACE-2, MT-trained"
-        "ACE-2, self-trained"
+        #"MT, self-trained",
+        "NPC, MT-trained",
+        #"NPC, self-trained",
+        "ACE-2, MT-trained"
+        #"ACE-2, self-trained"
     ]
+
+    dataset_num = 3
 
     frame_range = 20000
 
@@ -141,7 +147,7 @@ def main():
     plot_data(all_snr_data, conditions, output_folder, frame_range, param="SNR")
     plot_data(all_ssim_data, conditions, output_folder, frame_range, param="SSIM")
 
-    save_stats(mean_stats, conditions, output_folder)
+    save_stats(mean_stats, conditions, dataset_num, output_folder)
 
 if __name__ == "__main__":
     main()

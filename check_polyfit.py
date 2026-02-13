@@ -28,8 +28,19 @@ def fit(func, x: "np.ndarray", y: "np.ndarray"):
 
     return popt, pcov
 
+def mse(data, pred):
+
+    return np.mean((data - pred)**2)
+
+def save_fit_params(params, cov_mat, out: str, degree: str) -> None:
+
+    with open(os.path.join(out, degree + "_fit.txt"), "w") as f:
+        f.write("The coefficients are: " + str(params) + "\n \n")
+        f.write("The covariance matrix is: \n \n" + str(cov_mat))
+
+
 def plot_data(data: "np.ndarray", fit: "np.ndarray",
-              frames: "np.ndarray") -> None:
+              frames: "np.ndarray", out: str, degree: str) -> None:
     
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams['font.family'] = 'sans-serif'
@@ -41,17 +52,21 @@ def plot_data(data: "np.ndarray", fit: "np.ndarray",
     #colors = ["#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7"]
 
     ax.plot(frames, data, 'o', ls='-', linewidth=2.5,
-                 alpha=0.05, color='darkred',  label="data")
+                 alpha=0.05, color='darkred',  label="Data")
     ax.plot(frames, fit, ls='-', linewidth=2.5,
-                 alpha=0.75, color='darkblue',  label="fit")
+                 alpha=0.75, color='darkblue',  label="Fit")
     
     leg = plt.legend(bbox_to_anchor=(0.5, 1.175), loc='upper center', ncol=2)
 
     for line in leg.get_lines():
         line.set_linewidth(3.5)
+        line.set_alpha(1.0)
 
     for text in leg.get_texts():
         text.set_fontsize(28)
+    
+    #for lh in leg.legend_handles:
+        #lh.set_alpha
     
     ax.set_xlim(left=0, right=np.max(frames) + 100)
 
@@ -78,15 +93,17 @@ def plot_data(data: "np.ndarray", fit: "np.ndarray",
     ax.set_xlabel('Frame', labelpad=6, fontsize=32)
     ax.set_ylabel("SNR (dB)", labelpad=2, fontsize=32)
 
-    output_folder = "C:/users/mxq76232/Downloads/poly_test"
+    output_path_svg = os.path.join(out, degree + "_plot.svg")
+    output_path_png = os.path.join(out, degree + "_plot.png")
 
-    plt.savefig(os.path.join(output_folder, "d2_plot_poly3.svg"))
-    plt.savefig(os.path.join(output_folder, "d2_plot_poly3.png"))
+    plt.savefig(output_path_svg)
+    plt.savefig(output_path_png)
 
 def main():
 
     file = "C:/users/mxq76232/Downloads/poly_test/1_tubulin_self_train.csv"
     file2 = "C:/users/mxq76232/Downloads/poly_test/d2_tub_self.csv"
+    out = "C:/users/mxq76232/Downloads/poly_test"
     data = load_snr_ssim_file(file)
     data2 = load_snr_ssim_file(file2)
 
@@ -94,16 +111,13 @@ def main():
     snr2 = data2[:20000, 0]
     frames = 1 + np.arange(20000)
 
-    popt, pcov = fit(poly_3rd, frames, snr)
-    popt2, pcov2 = fit(poly_3rd, frames, snr2) 
+    popt, pcov = fit(poly_2nd, frames, snr)
+    #popt2, pcov2 = fit(poly_3rd, frames, snr2) 
 
-    pred_snr = poly_3rd(frames, popt[0], popt[1], popt[2], popt[3])
+    pred_snr = poly_2nd(frames, popt[0], popt[1], popt[2])
 
-    mse = np.mean((snr2 - pred_snr)**2)
-    print(popt)
-    print(popt2)
-
-    plot_data(snr2, pred_snr, frames)
+    plot_data(snr, pred_snr, frames, out, "2nd")
+    save_fit_params(popt, pcov, out, "2nd")
 
 if __name__ == "__main__":
     main()
