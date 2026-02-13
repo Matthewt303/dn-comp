@@ -97,7 +97,7 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     plt.rcParams["xtick.bottom"] = True
     plt.rcParams["ytick.left"] = True
 
-    fig, ax = plt.subplots(figsize=(11, 11), dpi=500)
+    fig, ax = plt.subplots(figsize=(13, 13), dpi=500)
 
     dataset_total = len(set(all_data["Dataset"]))
     mean_snrs, _ = calc_means(all_data)
@@ -141,7 +141,7 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     graph.tick_params(labelsize=30, pad=4)
     graph.legend_.remove()
 
-    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.175), loc='upper center', ncols=6,
+    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.155), loc='upper center', ncols=6,
                      title_fontsize=26, facecolor='white')
     
     leg.get_texts()[0].set_text('Mean 1')
@@ -170,7 +170,7 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.tick_params(axis="x", which="minor", length=3, direction="in")
 
     ax.yaxis.set_minor_locator(AutoMinorLocator(10))
-    ax.yaxis.set_major_formatter(FormatStrFormatter("%.0f"))
+    ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
 
     ax.xaxis.label.set_color("black")
     ax.yaxis.label.set_color("black")
@@ -196,14 +196,14 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams["font.family"] = "sans-serif"
-    mpl.rcParams["font.size"] = 28
+    mpl.rcParams["font.size"] = 30
 
     sns.set_style("ticks")
 
     plt.rcParams["xtick.bottom"] = True
     plt.rcParams["ytick.left"] = True
 
-    fig, ax = plt.subplots(figsize=(11, 11), dpi=500)
+    fig, ax = plt.subplots(figsize=(18, 18), dpi=500)
 
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
@@ -218,7 +218,7 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         hue = "Training Method",
         alpha=0.5,
         palette=sns.color_palette('viridis', dataset_total),
-        size=9
+        size=14
     )
 
     sns.pointplot(
@@ -229,7 +229,7 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         markers="_",
         linestyles="none",
         capsize=0.2,
-        linewidth=4.0,
+        linewidth=5.0,
         color="black",
     )
 
@@ -242,13 +242,13 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         hue='Dataset',
         markers=['*', 'D', '^'],
         palette=sns.color_palette("colorblind", dataset_total),
-        markersize=13.5) 
+        markersize=15.5) 
 
-    graph.tick_params(labelsize=30, pad=4)
+    graph.tick_params(labelsize=33, pad=4)
     graph.legend_.remove()
 
-    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.175), loc='upper center', ncols=6,
-                     title_fontsize=26, facecolor='white')
+    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.145), loc='upper center', ncols=6,
+                     title_fontsize=38, facecolor='white')
     
     leg.get_texts()[0].set_text('Mean 1')
     leg.get_texts()[1].set_text('Mean 2')
@@ -266,7 +266,7 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.tick_params(axis="x", which="minor", length=3, direction="in")
 
     ax.yaxis.set_minor_locator(AutoMinorLocator(10))
-    ax.yaxis.set_major_formatter(FormatStrFormatter("%.0f"))
+    ax.yaxis.set_major_formatter(FormatStrFormatter("%.5f"))
 
     ax.xaxis.label.set_color("black")
     ax.yaxis.label.set_color("black")
@@ -317,6 +317,11 @@ def main():
     
     all_stats = combine_stats(self_train_stats, tub_train_stats,
                               condition_a, condition_b, out_folder)
+    
+    all_mean_snrs, all_mean_ssims = calc_means(all_stats)
+
+    all_mean_snrs.to_csv(os.path.join(out_folder, "all_mean_snrs.csv"), index=False)
+    all_mean_ssims.to_csv(os.path.join(out_folder, "all_mean_ssims.csv"), index=False)
 
     plot_snr(all_stats, out_folder)
     plot_ssim(all_stats, out_folder)
