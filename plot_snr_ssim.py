@@ -42,7 +42,7 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
         ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
     else:
         y_unit = ""
-        ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%.3f"))
 
     #colors = cmap(np.linspace(0, 1, len(conditions)))
     colors = ["darkblue", "darkred", "darkviolet"]
@@ -91,7 +91,7 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     ax.set_ylabel(param + y_unit, labelpad=2, fontsize=32)
 
     plt.savefig(os.path.join(output_folder, param + "_plot.svg"))
-    plt.savefig(os.path.join(output_folder, param + "_plot.png"))
+    plt.savefig(os.path.join(output_folder, param + "_plot.pdf"))
 
 def save_stats(mean_stats: "np.ndarray", conditions: list[str],
                dataset_num: int, output_folder: str) -> None:
@@ -109,17 +109,16 @@ def main():
 
     ##--------PATHS-------##
 
-    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d3_snr_ssim_meas/tub"
-    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d3_snr_ssim_meas/tub_results"
+    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/elyra_d3_snr_ssim_meas/scmos"
+    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/elyra_d3_snr_ssim_meas/scmos_results"
     
     ##--------INITIALIZE-------##
     
     conditions = [
-        #"MT, self-trained",
-        "NPC, MT-trained",
-        #"NPC, self-trained",
-        "ACE-2, MT-trained"
-        #"ACE-2, self-trained"
+        #"MT, EMCCD-trained",
+        #"NPC, EMCCD-trained"
+        "MT, sCMOS-trained",
+        "NPC sCMOS-trained"
     ]
 
     dataset_num = 3

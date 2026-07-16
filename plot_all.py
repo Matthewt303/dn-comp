@@ -90,14 +90,14 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams["font.family"] = "sans-serif"
-    mpl.rcParams["font.size"] = 28
+    mpl.rcParams["font.size"] = 30
 
     sns.set_style("ticks")
 
     plt.rcParams["xtick.bottom"] = True
     plt.rcParams["ytick.left"] = True
 
-    fig, ax = plt.subplots(figsize=(13, 13), dpi=500)
+    fig, ax = plt.subplots(figsize=(16, 16), dpi=500)
 
     dataset_total = len(set(all_data["Dataset"]))
     mean_snrs, _ = calc_means(all_data)
@@ -109,9 +109,9 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
         x=all_data.columns[0],
         y=all_data[all_data.columns[2]],
         data=all_data,
-        hue = "Training Method",
-        alpha=0.5,
-        palette=sns.color_palette('viridis', dataset_total),
+        hue = "Dataset",
+        alpha=0.7,
+        palette=["#0077BB", "#009988", "#EE7733"],
         size=9
     )
 
@@ -135,18 +135,21 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
         linestyles='none',
         hue='Dataset',
         markers=['*', 'D', '^'],
-        palette=sns.color_palette("colorblind", dataset_total),
+        palette=["#0077BB", "#009988", "#EE7733"],
         markersize=13.5) 
 
     graph.tick_params(labelsize=30, pad=4)
     graph.legend_.remove()
 
-    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.155), loc='upper center', ncols=6,
-                     title_fontsize=26, facecolor='white')
+    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.145), loc='upper center', ncols=6,
+                     title_fontsize=32, facecolor='white')
     
-    leg.get_texts()[0].set_text('Mean 1')
-    leg.get_texts()[1].set_text('Mean 2')
-    leg.get_texts()[2].set_text('Mean 3')
+    leg.get_texts()[0].set_text('1')
+    leg.get_texts()[1].set_text('2')
+    leg.get_texts()[2].set_text('3')
+    leg.get_texts()[3].set_text('Mean 1')
+    leg.get_texts()[4].set_text('Mean 2')
+    leg.get_texts()[5].set_text('Mean 3')
     
     for line in leg.get_lines():
         line.set_linewidth(3.5)
@@ -170,7 +173,7 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.tick_params(axis="x", which="minor", length=3, direction="in")
 
     ax.yaxis.set_minor_locator(AutoMinorLocator(10))
-    ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
+    #ax.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
 
     ax.xaxis.label.set_color("black")
     ax.yaxis.label.set_color("black")
@@ -184,10 +187,11 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.spines["right"].set_linewidth(2.0)
     ax.spines["left"].set_linewidth(2.0)
 
-    ax.set_xlabel("Training", labelpad=6, fontsize=36)
-    ax.set_ylabel(all_data.columns[2], labelpad=3, fontsize=36)
+    ax.set_xlabel("Training", labelpad=8, fontsize=36)
+    ax.set_ylabel(all_data.columns[2], labelpad=12, fontsize=36)
 
     plt.savefig(os.path.join(output_folder, "all_snr_plot.png"))
+    plt.savefig(os.path.join(output_folder, "all_snr_plot.pdf"))
     plt.savefig(os.path.join(output_folder, "all_snr_plot.svg"))
 
 def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
@@ -215,9 +219,9 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         x=all_data.columns[0],
         y=all_data[all_data.columns[3]],
         data=all_data,
-        hue = "Training Method",
+        hue = "Dataset",
         alpha=0.5,
-        palette=sns.color_palette('viridis', dataset_total),
+        palette=["#0077BB", "#009988", "#EE7733"],
         size=14
     )
 
@@ -241,7 +245,7 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         linestyles='none',
         hue='Dataset',
         markers=['*', 'D', '^'],
-        palette=sns.color_palette("colorblind", dataset_total),
+        palette=["#0077BB", "#009988", "#EE7733"],
         markersize=15.5) 
 
     graph.tick_params(labelsize=33, pad=4)
@@ -249,10 +253,22 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.145), loc='upper center', ncols=6,
                      title_fontsize=38, facecolor='white')
+    leg.get_texts()[0].set_text('1')
+    leg.get_texts()[1].set_text('2')
+    leg.get_texts()[2].set_text('3')
+    leg.get_texts()[3].set_text('Mean 1')
+    leg.get_texts()[4].set_text('Mean 2')
+    leg.get_texts()[5].set_text('Mean 3')
+
+    for line in leg.get_lines():
+        line.set_linewidth(3.5)
+        line.set_alpha(1.0)
     
-    leg.get_texts()[0].set_text('Mean 1')
-    leg.get_texts()[1].set_text('Mean 2')
-    leg.get_texts()[2].set_text('Mean 3')
+    for handle in leg.legend_handles:
+        handle.set_alpha(1.0)
+
+    for text in leg.get_texts():
+        text.set_fontsize(28)
 
     ratio = 1.0
 
@@ -266,7 +282,10 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.tick_params(axis="x", which="minor", length=3, direction="in")
 
     ax.yaxis.set_minor_locator(AutoMinorLocator(10))
-    ax.yaxis.set_major_formatter(FormatStrFormatter("%.5f"))
+    #ax.yaxis.set_major_formatter(FormatStrFormatter("%.3f"))
+
+    #ax.ticklabel_format(axis='y', style='scientific', scilimits=(-1, -1))
+    #ax.yaxis.get_offset_text().set_fontsize(24)
 
     ax.xaxis.label.set_color("black")
     ax.yaxis.label.set_color("black")
@@ -280,21 +299,26 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.spines["right"].set_linewidth(2.0)
     ax.spines["left"].set_linewidth(2.0)
 
-    ax.set_xlabel("Training", labelpad=6, fontsize=36)
-    ax.set_ylabel(all_data.columns[3], labelpad=3, fontsize=36)
+    ax.set_xlabel("Training", labelpad=8, fontsize=42)
+    ax.set_ylabel(all_data.columns[3], labelpad=12, fontsize=42)
 
     plt.savefig(os.path.join(output_folder, "all_ssim_plot.png"))
+    plt.savefig(os.path.join(output_folder, "all_ssim_plot.pdf"))
     plt.savefig(os.path.join(output_folder, "all_ssim_plot.svg"))
 
 def main():
 
     ##--------PATHS-------##
 
-    tub_trained = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/all_self_snr_ssim/tub_train"
     self_trained = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/all_self_snr_ssim/self_train"
-    out_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/all_snr_ssim_results"
+    tub_trained = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/all_self_snr_ssim/tub_train"
+    out_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/all_self_snr_ssim/all_snr_ssim_results"
 
     ##--------INITIALIZATION-------##
+
+    # Mapping:
+    # Self-trained -> EMCCD
+    # Tub-trained -> sCMOS
 
     condition_a = "Self-trained"
     condition_b = "MT-trained"
