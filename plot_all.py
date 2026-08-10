@@ -83,6 +83,12 @@ def calc_means(all_data: "pd.DataFrame") -> tuple["pd.DataFrame", "pd.DataFrame"
 
     return mean_snr, mean_ssim
     
+def export_legend(legend, filename: str):
+    legend.get_frame().set_linewidth(0.0)
+    fig  = legend.figure
+    fig.canvas.draw()
+    bbox  = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(filename, dpi="figure", bbox_inches=bbox)
 
 def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
 
@@ -90,7 +96,7 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams["font.family"] = "sans-serif"
-    mpl.rcParams["font.size"] = 30
+    mpl.rcParams["font.size"] = 42
 
     sns.set_style("ticks")
 
@@ -138,11 +144,11 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
         palette=["#0077BB", "#009988", "#EE7733"],
         markersize=13.5) 
 
-    graph.tick_params(labelsize=30, pad=4)
+    graph.tick_params(labelsize=42, pad=4)
     graph.legend_.remove()
 
-    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.145), loc='upper center', ncols=6,
-                     title_fontsize=32, facecolor='white')
+    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.195), loc='upper center', ncols=3,
+                     title_fontsize=26, facecolor='white', frameon=False)
     
     leg.get_texts()[0].set_text('1')
     leg.get_texts()[1].set_text('2')
@@ -150,7 +156,7 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     leg.get_texts()[3].set_text('Mean 1')
     leg.get_texts()[4].set_text('Mean 2')
     leg.get_texts()[5].set_text('Mean 3')
-    
+
     for line in leg.get_lines():
         line.set_linewidth(3.5)
         line.set_alpha(1.0)
@@ -160,6 +166,8 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     for text in leg.get_texts():
         text.set_fontsize(24)
+
+    export_legend(leg, os.path.join(output_folder, "snr_plot_legend.svg"))
 
     ratio = 1.0
 
@@ -187,8 +195,10 @@ def plot_snr(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.spines["right"].set_linewidth(2.0)
     ax.spines["left"].set_linewidth(2.0)
 
-    ax.set_xlabel("Training", labelpad=8, fontsize=36)
-    ax.set_ylabel(all_data.columns[2], labelpad=12, fontsize=36)
+    ax.set_xlabel("Training", labelpad=8, fontsize=42)
+    ax.set_ylabel(all_data.columns[2], labelpad=12, fontsize=42)
+
+    ax.get_legend().remove()
 
     plt.savefig(os.path.join(output_folder, "all_snr_plot.png"))
     plt.savefig(os.path.join(output_folder, "all_snr_plot.pdf"))
@@ -200,14 +210,14 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     mpl.rcParams["font.sans-serif"] = ["Arial"]
     mpl.rcParams["font.family"] = "sans-serif"
-    mpl.rcParams["font.size"] = 30
+    mpl.rcParams["font.size"] = 42
 
     sns.set_style("ticks")
 
     plt.rcParams["xtick.bottom"] = True
     plt.rcParams["ytick.left"] = True
 
-    fig, ax = plt.subplots(figsize=(18, 18), dpi=500)
+    fig, ax = plt.subplots(figsize=(16, 16), dpi=500)
 
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
@@ -248,17 +258,18 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         palette=["#0077BB", "#009988", "#EE7733"],
         markersize=15.5) 
 
-    graph.tick_params(labelsize=33, pad=4)
+    graph.tick_params(labelsize=42, pad=4)
     graph.legend_.remove()
 
-    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.145), loc='upper center', ncols=6,
-                     title_fontsize=38, facecolor='white')
+    leg = plt.legend(title="Dataset", bbox_to_anchor=(0.5, 1.155), loc='upper center', ncols=3,
+                     title_fontsize=26, facecolor='white', frameon=False)
     leg.get_texts()[0].set_text('1')
     leg.get_texts()[1].set_text('2')
     leg.get_texts()[2].set_text('3')
     leg.get_texts()[3].set_text('Mean 1')
     leg.get_texts()[4].set_text('Mean 2')
     leg.get_texts()[5].set_text('Mean 3')
+    leg.get_frame().set_linewidth(0.0)
 
     for line in leg.get_lines():
         line.set_linewidth(3.5)
@@ -268,7 +279,9 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
         handle.set_alpha(1.0)
 
     for text in leg.get_texts():
-        text.set_fontsize(28)
+        text.set_fontsize(24)
+
+    export_legend(leg, os.path.join(output_folder, "ssim_plot_legend.svg"))
 
     ratio = 1.0
 
@@ -282,10 +295,8 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
     ax.tick_params(axis="x", which="minor", length=3, direction="in")
 
     ax.yaxis.set_minor_locator(AutoMinorLocator(10))
-    #ax.yaxis.set_major_formatter(FormatStrFormatter("%.3f"))
 
-    #ax.ticklabel_format(axis='y', style='scientific', scilimits=(-1, -1))
-    #ax.yaxis.get_offset_text().set_fontsize(24)
+    #ax.ticklabel_format(axis='y', style='plain')
 
     ax.xaxis.label.set_color("black")
     ax.yaxis.label.set_color("black")
@@ -301,6 +312,8 @@ def plot_ssim(all_data: "pd.DataFrame", output_folder: str) -> None:
 
     ax.set_xlabel("Training", labelpad=8, fontsize=42)
     ax.set_ylabel(all_data.columns[3], labelpad=12, fontsize=42)
+
+    ax.get_legend().remove()
 
     plt.savefig(os.path.join(output_folder, "all_ssim_plot.png"))
     plt.savefig(os.path.join(output_folder, "all_ssim_plot.pdf"))

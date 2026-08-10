@@ -39,13 +39,13 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
 
     if param == "SNR":
         y_unit = " (dB)"
-        ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%.0f"))
     else:
         y_unit = ""
-        ax.yaxis.set_major_formatter(FormatStrFormatter("%.3f"))
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%.4f"))
 
     #colors = cmap(np.linspace(0, 1, len(conditions)))
-    colors = ["darkblue", "darkred", "darkviolet"]
+    colors = ["#0077BB", "#CC3311", "#AA4499"]
 
     frame_axis = 1 + np.arange(frame_range)
 
@@ -54,7 +54,7 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
         data_20k = data[i][:frame_range]
 
         ax.plot(frame_axis, data_20k, ls='-', linewidth=4.5,
-                 alpha=0.7, color=colors[i],  label=conditions[i])
+                 alpha=1.0, color=colors[i],  label=conditions[i])
     
     leg = plt.legend(bbox_to_anchor=(0.5, 1.125), loc='upper center', ncol=3)
 
@@ -91,6 +91,7 @@ def plot_data(data: list["np.ndarray"], conditions: list[str],
     ax.set_ylabel(param + y_unit, labelpad=2, fontsize=32)
 
     plt.savefig(os.path.join(output_folder, param + "_plot.svg"))
+    plt.savefig(os.path.join(output_folder, param + "_plot.png"))
     plt.savefig(os.path.join(output_folder, param + "_plot.pdf"))
 
 def save_stats(mean_stats: "np.ndarray", conditions: list[str],
@@ -109,19 +110,19 @@ def main():
 
     ##--------PATHS-------##
 
-    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/elyra_d3_snr_ssim_meas/scmos"
-    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/elyra_d3_snr_ssim_meas/scmos_results"
+    input_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d3_snr_ssim_meas/self"
+    output_folder = "C:/Users/mxq76232/Documents/PhD/Project_work/dn_paper_data/d3_snr_ssim_meas/self_results"
     
     ##--------INITIALIZE-------##
     
     conditions = [
         #"MT, EMCCD-trained",
         #"NPC, EMCCD-trained"
-        "MT, sCMOS-trained",
-        "NPC sCMOS-trained"
+        "NPC, self-trained",
+        "ACE-2, self-trained"
     ]
 
-    dataset_num = 3
+    dataset_num = 2
 
     frame_range = 20000
 
